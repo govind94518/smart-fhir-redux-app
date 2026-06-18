@@ -7,6 +7,7 @@
     "install:cache": "node scripts/install-from-cache.mjs",
     "dev": "vite --host 127.0.0.1",
     "build": "tsc -b && vite build",
+    "build:pages": "tsc -b && vite build --base=/smart-fhir-redux-app/ && node scripts/copy-spa-fallback.mjs",
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {

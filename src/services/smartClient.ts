@@ -21,7 +21,7 @@ const DEMO_FHIR_BASE_URL = import.meta.env.VITE_DEMO_FHIR_BASE_URL ?? "https://r
 const SMART_CLIENT_ID = import.meta.env.VITE_SMART_CLIENT_ID ?? "my_web_app";
 const SMART_SCOPE =
   import.meta.env.VITE_SMART_SCOPE ??
-  "patient/Patient.read patient/Observation.read launch online_access openid profile";
+  "patient/Patient.read patient/Observation.read launch/patient online_access openid profile";
 
 let activeClient: SmartClient | null = null;
 

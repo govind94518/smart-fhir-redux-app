@@ -24,6 +24,7 @@ pressure, LDL, and HDL.
 ```bash
 npm run dev
 npm run build
+npm run build:pages
 npm run preview
 ```
 
@@ -42,3 +43,24 @@ That command installs dependencies from this machine's npm cache when registry a
 - `src/pages/DashboardPage.tsx`: Main app dashboard.
 - `src/pages/LaunchPage.tsx`: SMART launch route.
 - `src/components/ClinicalFlow.tsx`: Data-flow visualization.
+
+## GitHub Pages
+
+For the Cerner standalone patient tutorial flow, register the app with a public
+GitHub Pages redirect URL:
+
+```text
+https://<github-username>.github.io/smart-fhir-redux-app/
+```
+
+Build the GitHub Pages artifact with:
+
+```bash
+npm run build:pages
+```
+
+This uses `/smart-fhir-redux-app/` as the Vite base path and creates `dist/404.html`
+so direct routes like `/smart-fhir-redux-app/launch?iss=...` work on GitHub Pages.
+
+If your repository name is different, update the `--base=/smart-fhir-redux-app/`
+value in `package.json`.

@@ -4,30 +4,30 @@ import { ArrowLeft, LoaderCircle, Play } from "lucide-react";
 import { beginSmartAuthorization } from "../services/smartClient";
 
 export function LaunchPage() {
-  const hasLaunchContext = useMemo(() => {
+  const hasIssuer = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.has("iss") && params.has("launch");
+    return params.has("iss");
   }, []);
 
   useEffect(() => {
-    if (hasLaunchContext) {
+    if (hasIssuer) {
       beginSmartAuthorization();
     }
-  }, [hasLaunchContext]);
+  }, [hasIssuer]);
 
   return (
     <main className="launch-shell">
       <div className="launch-panel">
         <div className="launch-icon">
-          {hasLaunchContext ? <LoaderCircle size={30} className="spin" aria-hidden="true" /> : <Play size={30} aria-hidden="true" />}
+          {hasIssuer ? <LoaderCircle size={30} className="spin" aria-hidden="true" /> : <Play size={30} aria-hidden="true" />}
         </div>
-        <h1>{hasLaunchContext ? "Starting SMART authorization" : "SMART launch context missing"}</h1>
+        <h1>{hasIssuer ? "Starting SMART authorization" : "SMART issuer missing"}</h1>
         <p>
-          {hasLaunchContext
-            ? "The app is connecting to the EHR authorization server."
-            : "This route expects SMART launch parameters from an EHR or SMART launcher."}
+          {hasIssuer
+            ? "The app is connecting to the SMART authorization server."
+            : "This route expects an iss parameter from a SMART standalone or EHR launch."}
         </p>
-        {!hasLaunchContext && (
+        {!hasIssuer && (
           <Link className="secondary-action" to="/">
             <ArrowLeft size={18} aria-hidden="true" />
             Back to dashboard
