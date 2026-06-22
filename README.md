@@ -65,6 +65,33 @@ so direct routes like `/smart-fhir-redux-app/launch?iss=...` work on GitHub Page
 If your repository name is different, update the `--base=/smart-fhir-redux-app/`
 value in `package.json`.
 
+## SMART Client ID
+
+Local development reads the SMART client ID from `.env`:
+
+```text
+VITE_SMART_CLIENT_ID=489561bc-5383-4abe-98a9-7934142ea08e
+```
+
+The GitHub Pages workflow also passes this value during `npm run build:pages`.
+To override it without editing code, create a GitHub repository variable named:
+
+```text
+VITE_SMART_CLIENT_ID
+```
+
+The variable is read here:
+
+```text
+.github/workflows/pages.yml
+```
+
+The app uses the value in:
+
+```text
+src/services/smartClient.ts
+```
+
 ## SMART Launcher
 
 Use this launch URL in the SMART sandbox:

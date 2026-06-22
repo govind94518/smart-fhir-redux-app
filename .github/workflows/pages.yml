@@ -31,6 +31,8 @@ jobs:
         run: npm install
 
       - name: Build GitHub Pages artifact
+        env:
+          VITE_SMART_CLIENT_ID: ${{ vars.VITE_SMART_CLIENT_ID || '489561bc-5383-4abe-98a9-7934142ea08e' }}
         run: npm run build:pages
 
       - name: Upload Pages artifact
