@@ -61,6 +61,8 @@ npm run build:pages
 
 This uses `/smart-fhir-redux-app/` as the Vite base path and creates `dist/404.html`
 so direct routes like `/smart-fhir-redux-app/launch?iss=...` work on GitHub Pages.
+The build also includes `dist/launch/index.html` as a physical fallback for SMART
+launch URLs, then restores the original `/launch?...` route in the React app.
 
 If your repository name is different, update the `--base=/smart-fhir-redux-app/`
 value in `package.json`.
