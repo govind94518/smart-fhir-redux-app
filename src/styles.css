@@ -494,6 +494,349 @@ button:disabled {
   overflow-wrap: anywhere;
 }
 
+.radiology-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.metric-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 74px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.metric-card > span {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: #e7f6f4;
+  color: var(--teal);
+  flex: 0 0 auto;
+}
+
+.metric-card strong,
+.metric-card small {
+  display: block;
+}
+
+.metric-card strong {
+  color: var(--ink);
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+
+.metric-card small {
+  margin-top: 4px;
+  color: var(--text-soft);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.radiology-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 260px) minmax(0, 1fr) minmax(300px, 360px);
+  gap: 16px;
+  align-items: start;
+}
+
+.radiology-main {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.filter-panel,
+.radiology-results,
+.request-panel,
+.exam-details {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.filter-panel,
+.request-panel,
+.exam-details,
+.radiology-results {
+  padding: 16px;
+}
+
+.filter-panel {
+  position: sticky;
+  top: 16px;
+  display: grid;
+  gap: 14px;
+}
+
+.filter-panel label {
+  display: grid;
+  gap: 6px;
+  color: var(--ink);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.filter-panel select,
+.filter-panel input {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfe;
+  color: var(--ink);
+  padding: 0 10px;
+}
+
+.domain-list {
+  display: grid;
+  gap: 8px;
+}
+
+.domain-card {
+  display: grid;
+  gap: 5px;
+  padding: 10px;
+  border: 1px solid rgba(180, 83, 9, 0.28);
+  border-radius: 8px;
+  background: #fffbeb;
+}
+
+.domain-card.configured {
+  border-color: rgba(15, 118, 110, 0.24);
+  background: #f0fdfa;
+}
+
+.domain-card strong,
+.domain-card span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.domain-card span {
+  color: var(--text-soft);
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.results-table-wrap {
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.results-table {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: collapse;
+}
+
+.results-table th,
+.results-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 12px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.results-table th {
+  background: #f8fbfc;
+  color: var(--text-soft);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.results-table tbody tr {
+  cursor: pointer;
+}
+
+.results-table tbody tr:hover,
+.results-table tbody tr.selected {
+  background: #f0f9ff;
+}
+
+.results-table td strong,
+.results-table td span {
+  display: block;
+}
+
+.results-table td span {
+  margin-top: 4px;
+  color: var(--text-soft);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.inline-action,
+.availability-pill,
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 34px;
+  border-radius: 8px;
+  padding: 0 10px;
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.inline-action {
+  border: 1px solid rgba(29, 78, 216, 0.28);
+  background: #eff6ff;
+  color: var(--blue);
+}
+
+.availability-pill.ready,
+.status-badge.success {
+  border: 1px solid rgba(21, 128, 61, 0.24);
+  background: #f0fdf4;
+  color: var(--green);
+}
+
+.availability-pill.missing,
+.status-badge.warning {
+  border: 1px solid rgba(180, 83, 9, 0.28);
+  background: #fffbeb;
+  color: var(--amber);
+}
+
+.request-list {
+  display: grid;
+  gap: 10px;
+  max-height: 680px;
+  overflow: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.request-list li {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfe;
+}
+
+.request-list li.succeeded .request-icon {
+  color: var(--green);
+}
+
+.request-list li.warning .request-icon {
+  color: var(--amber);
+}
+
+.request-list li.failed .request-icon {
+  color: var(--rose);
+}
+
+.request-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #edf3f5;
+}
+
+.request-list strong,
+.request-list span {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.request-list span {
+  margin-top: 4px;
+  color: var(--text-soft);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.detail-summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfe;
+}
+
+.detail-summary strong,
+.detail-summary span {
+  display: block;
+}
+
+.detail-summary > div > span {
+  margin-top: 5px;
+  color: var(--text-soft);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.detail-list.compact {
+  margin-bottom: 14px;
+}
+
+.detail-list.compact div {
+  grid-template-columns: minmax(116px, 0.36fr) minmax(0, 1fr);
+}
+
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.exam-warning-list {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.exam-warning-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: #854d0e;
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.landing-empty {
+  min-height: 220px;
+}
+
+.demo-note {
+  background: #fffbeb;
+  border-color: rgba(180, 83, 9, 0.28);
+  color: #854d0e;
+}
+
 .empty-state,
 .loading-line {
   display: grid;
@@ -557,6 +900,14 @@ button:disabled {
   .flow-strip {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  .radiology-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-panel {
+    position: static;
+  }
 }
 
 @media (max-width: 760px) {
@@ -578,11 +929,14 @@ button:disabled {
   .dashboard-grid,
   .tutorial-tables,
   .resource-grid,
+  .radiology-metrics,
   .flow-strip {
     grid-template-columns: 1fr;
   }
 
+  .detail-summary,
   .detail-list div {
+    display: grid;
     grid-template-columns: 1fr;
   }
 

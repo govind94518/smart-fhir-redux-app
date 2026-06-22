@@ -1,10 +1,10 @@
-import { useEffect } from "react";
-import { Activity, AlertTriangle, ClipboardList, FlaskConical, LogIn, LogOut, Pill, RefreshCcw, Stethoscope, TestTube2 } from "lucide-react";
-import { CernerTutorialPanel } from "../components/CernerTutorialPanel";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { AlertTriangle, DatabaseZap, FileText, ImageIcon, LogIn, LogOut, RefreshCcw, Search, TestTube2 } from "lucide-react";
 import { ClinicalFlow } from "../components/ClinicalFlow";
 import { PatientBanner } from "../components/PatientBanner";
-import { ResourceMix } from "../components/ResourceMix";
-import { ResourcePanel } from "../components/ResourcePanel";
+import { RadiologyExamDetails } from "../components/RadiologyExamDetails";
+import { RadiologyRequestPanel } from "../components/RadiologyRequestPanel";
+import { RadiologyResultsTable } from "../components/RadiologyResultsTable";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
   endClinicalSession,
@@ -14,10 +14,18 @@ import {
 } from "../features/clinical/clinicalSlice";
 import { hasSmartCallbackParams } from "../services/smartClient";
 
+type AvailabilityFilter = "all" | "ready" | "missing-report" | "missing-image";
+
 export function DashboardPage() {
   const dispatch = useAppDispatch();
   const { status, summary, error, mode } = useAppSelector((state) => state.clinical);
+  const [domainFilter, setDomainFilter] = useState("all");
+  const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>("all");
+  const [query, setQuery] = useState("");
+  const [selectedExamId, setSelectedExamId] = useState<string>();
   const isLoading = status === "loading";
+  const exams = summary?.radiology.exams ?? [];
+  const domains = summary?.radiology.domains ?? [];
 
   useEffect(() => {
     if (status === "idle" && hasSmartCallbackParams()) {
@@ -25,19 +33,46 @@ export function DashboardPage() {
     }
   }, [dispatch, status]);
 
+  const filteredExams = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    return exams.filter((exam) => {
+      const matchesDomain = domainFilter === "all" || exam.domainId === domainFilter;
+      const matchesAvailability =
+        availabilityFilter === "all" ||
+        (availabilityFilter === "ready" && exam.reportAvailable && exam.imageAvailable) ||
+        (availabilityFilter === "missing-report" && !exam.reportAvailable) ||
+        (availabilityFilter === "missing-image" && !exam.imageAvailable);
+      const matchesQuery =
+        !normalizedQuery ||
+        [exam.orderName, exam.modality, exam.accessionNumber, exam.studyId, exam.orderId, exam.domainName]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(normalizedQuery);
+
+      return matchesDomain && matchesAvailability && matchesQuery;
+    });
+  }, [availabilityFilter, domainFilter, exams, query]);
+
+  const selectedExam = filteredExams.find((exam) => exam.id === selectedExamId) ?? filteredExams[0] ?? null;
+  const reportCount = exams.filter((exam) => exam.reportAvailable).length;
+  const imageCount = exams.filter((exam) => exam.imageAvailable).length;
+  const configuredDomains = domains.filter((domain) => domain.configured).length;
+
   return (
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">SMART on FHIR</p>
-          <h1>Patient Summary</h1>
+          <p className="eyebrow">SMART on FHIR radiology POC</p>
+          <h1>SMART Radiology Viewer</h1>
         </div>
         <div className="actions">
           <button className="icon-button text-button" type="button" onClick={() => dispatch(startSmartSession())} disabled={isLoading} title="Resume SMART session">
             <LogIn size={18} aria-hidden="true" />
             SMART
           </button>
-          <button className="icon-button text-button" type="button" onClick={() => dispatch(startDemoSession())} disabled={isLoading} title="Load demo patient">
+          <button className="icon-button text-button" type="button" onClick={() => dispatch(startDemoSession())} disabled={isLoading} title="Load demo radiology data">
             <TestTube2 size={18} aria-hidden="true" />
             Demo
           </button>
@@ -76,44 +111,93 @@ export function DashboardPage() {
 
       <PatientBanner patient={summary?.patient ?? null} patientId={summary?.patientId} />
 
-      <CernerTutorialPanel summary={summary?.cernerTutorial} />
+      {summary ? (
+        <>
+          <section className="radiology-metrics" aria-label="Radiology summary">
+            <Metric icon={<DatabaseZap size={18} aria-hidden="true" />} label="Domains" value={`${configuredDomains}/${domains.length}`} />
+            <Metric icon={<Search size={18} aria-hidden="true" />} label="Exams" value={String(exams.length)} />
+            <Metric icon={<FileText size={18} aria-hidden="true" />} label="Reports" value={String(reportCount)} />
+            <Metric icon={<ImageIcon size={18} aria-hidden="true" />} label="Image studies" value={String(imageCount)} />
+          </section>
 
-      <div className="dashboard-grid">
-        <ResourceMix
-          medications={summary?.medications.length ?? 0}
-          observations={summary?.observations.length ?? 0}
-          conditions={summary?.conditions.length ?? 0}
-          encounters={summary?.encounters.length ?? 0}
-        />
-
-        <section className="warnings-panel">
-          <div className="section-heading">
-            <h2>
-              <Activity size={18} aria-hidden="true" />
-              Request Status
-            </h2>
-            <span>{summary?.warnings.length ?? 0} warnings</span>
-          </div>
-          {isLoading ? (
-            <div className="loading-line">Loading clinical resources...</div>
-          ) : summary?.warnings.length ? (
-            <ul className="warning-list">
-              {summary.warnings.map((warning) => (
-                <li key={warning}>{warning}</li>
-              ))}
-            </ul>
-          ) : (
-            <div className="empty-state">All configured resource calls completed.</div>
+          {summary.radiology.fallbackDemo && (
+            <section className="alert demo-note" role="status">
+              <AlertTriangle size={20} aria-hidden="true" />
+              <span>Demo mode is showing sample POC rows because the public FHIR server did not return radiology exam data.</span>
+            </section>
           )}
-        </section>
-      </div>
 
-      <div className="resource-grid">
-        <ResourcePanel title="Medications" countLabel={`${summary?.medications.length ?? 0} found`} resources={summary?.medications ?? []} icon={Pill} />
-        <ResourcePanel title="Lab Observations" countLabel={`${summary?.observations.length ?? 0} found`} resources={summary?.observations ?? []} icon={FlaskConical} />
-        <ResourcePanel title="Conditions" countLabel={`${summary?.conditions.length ?? 0} found`} resources={summary?.conditions ?? []} icon={ClipboardList} />
-        <ResourcePanel title="Encounters" countLabel={`${summary?.encounters.length ?? 0} found`} resources={summary?.encounters ?? []} icon={Stethoscope} />
-      </div>
+          <div className="radiology-layout">
+            <aside className="filter-panel" aria-label="Radiology filters">
+              <div className="section-heading">
+                <h2>
+                  <Search size={18} aria-hidden="true" />
+                  Filters
+                </h2>
+              </div>
+
+              <label>
+                Domain
+                <select value={domainFilter} onChange={(event) => setDomainFilter(event.target.value)}>
+                  <option value="all">All domains</option>
+                  {domains.map((domain) => (
+                    <option value={domain.id} key={domain.id}>
+                      {domain.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                Availability
+                <select value={availabilityFilter} onChange={(event) => setAvailabilityFilter(event.target.value as AvailabilityFilter)}>
+                  <option value="all">All exams</option>
+                  <option value="ready">Report + image ready</option>
+                  <option value="missing-report">Missing report</option>
+                  <option value="missing-image">Missing image</option>
+                </select>
+              </label>
+
+              <label>
+                Search
+                <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Order, accession, study ID" />
+              </label>
+
+              <div className="domain-list">
+                {domains.map((domain) => (
+                  <div className={domain.configured ? "domain-card configured" : "domain-card"} key={domain.id}>
+                    <strong>{domain.name}</strong>
+                    <span>{domain.configured ? domain.serverUrl : "Not configured"}</span>
+                  </div>
+                ))}
+              </div>
+            </aside>
+
+            <div className="radiology-main">
+              <RadiologyResultsTable exams={filteredExams} selectedExamId={selectedExam?.id} onSelect={setSelectedExamId} />
+              <RadiologyExamDetails exam={selectedExam} />
+            </div>
+
+            <RadiologyRequestPanel statuses={summary.radiology.requestStatuses} warnings={summary.warnings} />
+          </div>
+        </>
+      ) : (
+        <section className="empty-state landing-empty">
+          Launch from PowerChart or load Demo to see cross-domain radiology reports and image studies.
+        </section>
+      )}
     </main>
+  );
+}
+
+function Metric({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
+  return (
+    <div className="metric-card">
+      <span>{icon}</span>
+      <div>
+        <strong>{value}</strong>
+        <small>{label}</small>
+      </div>
+    </div>
   );
 }

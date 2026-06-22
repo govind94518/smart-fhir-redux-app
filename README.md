@@ -64,3 +64,39 @@ so direct routes like `/smart-fhir-redux-app/launch?iss=...` work on GitHub Page
 
 If your repository name is different, update the `--base=/smart-fhir-redux-app/`
 value in `package.json`.
+
+## SMART Launcher
+
+Use this launch URL in the SMART sandbox:
+
+```text
+https://<github-username>.github.io/smart-fhir-redux-app/launch
+```
+
+The app auto-selects scopes based on launch type:
+
+- Provider EHR Launch URLs include `iss` and `launch`, so the app requests `launch`.
+- Patient Standalone Launch URLs include only `iss`, so the app requests `launch/patient`.
+
+## Radiology POC Flow
+
+The dashboard is shaped around the 6-week SMART radiology POC:
+
+1. Launch from PowerChart or SMART Launcher.
+2. Resolve the launch patient.
+3. Query each configured Millennium domain.
+4. Load `/Patient`, `/Encounter`, `/DiagnosticReport`, `/ServiceRequest`, and `/radiology-orders/{orderId}/exam-info`.
+5. Merge radiology exams into one cross-domain table.
+6. Open report links from `DiagnosticReport.presentedForm`.
+7. Launch the image viewer when exam-info returns a study ID or viewer URL.
+
+Configure a second domain in `.env` when real cross-domain access is available:
+
+```text
+VITE_RADIOLOGY_DOMAIN_2_NAME=Millennium Domain 2
+VITE_RADIOLOGY_DOMAIN_2_URL=https://domain-two.example.com/fhir
+VITE_RADIOLOGY_DOMAIN_2_PATIENT_ID=domain-two-patient-id
+VITE_IMAGE_VIEWER_URL_TEMPLATE=https://viewer.example.com/launch?studyId={studyId}&orderId={orderId}
+```
+
+Demo mode falls back to local sample radiology rows only when the public demo FHIR server returns no radiology exams.
