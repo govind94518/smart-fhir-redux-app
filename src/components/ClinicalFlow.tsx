@@ -1,4 +1,4 @@
-import { Boxes, DatabaseZap, KeyRound, LogIn, MonitorCheck, ShieldCheck } from "lucide-react";
+import { DatabaseZap, FolderSync, LogIn, MonitorCheck, ShieldCheck, UserRound } from "lucide-react";
 
 interface ClinicalFlowProps {
   status: "idle" | "loading" | "succeeded" | "failed";
@@ -8,9 +8,9 @@ interface ClinicalFlowProps {
 const steps = [
   { label: "Launch", icon: LogIn },
   { label: "Authorize", icon: ShieldCheck },
-  { label: "Token", icon: KeyRound },
-  { label: "FHIR", icon: DatabaseZap },
-  { label: "Redux", icon: Boxes },
+  { label: "Patient", icon: UserRound },
+  { label: "Domains", icon: DatabaseZap },
+  { label: "Merge", icon: FolderSync },
   { label: "Render", icon: MonitorCheck },
 ];
 
