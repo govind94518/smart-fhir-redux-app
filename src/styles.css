@@ -525,7 +525,8 @@ button:disabled {
 }
 
 .metric-card strong,
-.metric-card small {
+.metric-card small,
+.metric-card em {
   display: block;
 }
 
@@ -542,9 +543,18 @@ button:disabled {
   text-transform: uppercase;
 }
 
+.metric-card em {
+  margin-top: 4px;
+  color: var(--text-soft);
+  font-size: 0.76rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
 .radiology-layout {
   display: grid;
-  grid-template-columns: minmax(220px, 260px) minmax(0, 1fr) minmax(300px, 360px);
+  grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
   gap: 16px;
   align-items: start;
 }
@@ -557,7 +567,6 @@ button:disabled {
 
 .filter-panel,
 .radiology-results,
-.request-panel,
 .exam-details {
   min-width: 0;
   border: 1px solid var(--line);
@@ -566,7 +575,6 @@ button:disabled {
 }
 
 .filter-panel,
-.request-panel,
 .exam-details,
 .radiology-results {
   padding: 16px;
@@ -714,61 +722,6 @@ button:disabled {
   border: 1px solid rgba(180, 83, 9, 0.28);
   background: #fffbeb;
   color: var(--amber);
-}
-
-.request-list {
-  display: grid;
-  gap: 10px;
-  max-height: 680px;
-  overflow: auto;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.request-list li {
-  display: grid;
-  grid-template-columns: 34px minmax(0, 1fr);
-  gap: 10px;
-  padding: 10px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fbfdfe;
-}
-
-.request-list li.succeeded .request-icon {
-  color: var(--green);
-}
-
-.request-list li.warning .request-icon {
-  color: var(--amber);
-}
-
-.request-list li.failed .request-icon {
-  color: var(--rose);
-}
-
-.request-icon {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: #edf3f5;
-}
-
-.request-list strong,
-.request-list span {
-  display: block;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.request-list span {
-  margin-top: 4px;
-  color: var(--text-soft);
-  font-size: 0.8rem;
-  line-height: 1.35;
 }
 
 .detail-summary {

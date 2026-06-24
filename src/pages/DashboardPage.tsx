@@ -3,7 +3,6 @@ import { AlertTriangle, DatabaseZap, FileText, ImageIcon, LogIn, LogOut, Refresh
 import { ClinicalFlow } from "../components/ClinicalFlow";
 import { PatientBanner } from "../components/PatientBanner";
 import { RadiologyExamDetails } from "../components/RadiologyExamDetails";
-import { RadiologyRequestPanel } from "../components/RadiologyRequestPanel";
 import { RadiologyResultsTable } from "../components/RadiologyResultsTable";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
@@ -26,6 +25,7 @@ export function DashboardPage() {
   const isLoading = status === "loading";
   const exams = summary?.radiology.exams ?? [];
   const domains = summary?.radiology.domains ?? [];
+  const requestStatuses = summary?.radiology.requestStatuses ?? [];
 
   useEffect(() => {
     if (status === "idle" && hasSmartCallbackParams()) {
@@ -59,6 +59,15 @@ export function DashboardPage() {
   const reportCount = exams.filter((exam) => exam.reportAvailable).length;
   const imageCount = exams.filter((exam) => exam.imageAvailable).length;
   const configuredDomains = domains.filter((domain) => domain.configured).length;
+  const diagnosticReportCount = requestCount(requestStatuses, "DiagnosticReport");
+  const serviceRequestCount = requestCount(requestStatuses, "ServiceRequest");
+  const hasFilteredOutReports = diagnosticReportCount > reportCount && !summary?.radiology.fallbackDemo;
+  const reportMetricValue = hasFilteredOutReports ? `${reportCount}/${diagnosticReportCount}` : String(reportCount);
+  const reportMetricLabel = hasFilteredOutReports ? "Reports matched/returned" : "Reports";
+  const examMetricHint =
+    diagnosticReportCount || serviceRequestCount ? `${diagnosticReportCount} DiagnosticReports, ${serviceRequestCount} orders returned` : undefined;
+  const reportMetricHint = hasFilteredOutReports ? "Only radiology-coded reports become exams" : undefined;
+  const imageMetricHint = exams.length ? `${imageCount} of ${exams.length} exams ready` : "No radiology exams";
 
   return (
     <main className="app-shell">
@@ -114,10 +123,10 @@ export function DashboardPage() {
       {summary ? (
         <>
           <section className="radiology-metrics" aria-label="Radiology summary">
-            <Metric icon={<DatabaseZap size={18} aria-hidden="true" />} label="Domains" value={`${configuredDomains}/${domains.length}`} />
-            <Metric icon={<Search size={18} aria-hidden="true" />} label="Exams" value={String(exams.length)} />
-            <Metric icon={<FileText size={18} aria-hidden="true" />} label="Reports" value={String(reportCount)} />
-            <Metric icon={<ImageIcon size={18} aria-hidden="true" />} label="Image studies" value={String(imageCount)} />
+            <Metric icon={<DatabaseZap size={18} aria-hidden="true" />} label="Domains configured" value={`${configuredDomains}/${domains.length}`} />
+            <Metric icon={<Search size={18} aria-hidden="true" />} label="Radiology exams" value={String(exams.length)} hint={examMetricHint} />
+            <Metric icon={<FileText size={18} aria-hidden="true" />} label={reportMetricLabel} value={reportMetricValue} hint={reportMetricHint} />
+            <Metric icon={<ImageIcon size={18} aria-hidden="true" />} label="Image studies" value={String(imageCount)} hint={imageMetricHint} />
           </section>
 
           {summary.radiology.fallbackDemo && (
@@ -177,8 +186,6 @@ export function DashboardPage() {
               <RadiologyResultsTable exams={filteredExams} selectedExamId={selectedExam?.id} onSelect={setSelectedExamId} />
               <RadiologyExamDetails exam={selectedExam} />
             </div>
-
-            <RadiologyRequestPanel statuses={summary.radiology.requestStatuses} warnings={summary.warnings} />
           </div>
         </>
       ) : (
@@ -190,14 +197,25 @@ export function DashboardPage() {
   );
 }
 
-function Metric({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
+function Metric({ icon, label, value, hint }: { icon: ReactNode; label: string; value: string; hint?: string }) {
   return (
     <div className="metric-card">
       <span>{icon}</span>
       <div>
         <strong>{value}</strong>
         <small>{label}</small>
+        {hint ? <em>{hint}</em> : null}
       </div>
     </div>
   );
+}
+
+function requestCount(statuses: Array<{ label: string; count?: number; status: string }>, label: string) {
+  return statuses.reduce((total, status) => {
+    if (status.label !== label || status.status !== "succeeded") {
+      return total;
+    }
+
+    return total + (status.count ?? 0);
+  }, 0);
 }
